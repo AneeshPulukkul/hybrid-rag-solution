@@ -1,0 +1,44 @@
+# ConfigMap for non-sensitive configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hybrid-rag-config
+  namespace: hybrid-rag
+  labels:
+    app.kubernetes.io/name: hybrid-rag
+    app.kubernetes.io/part-of: hybrid-rag-enterprise
+data:
+  # OpenAI Model Configuration
+  OPENAI_MODEL: "gpt-4o-mini"
+  OPENAI_EMBEDDING_MODEL: "text-embedding-3-small"
+  
+  # LangSmith Configuration
+  LANGCHAIN_TRACING_V2: "true"
+  LANGCHAIN_ENDPOINT: "https://api.smith.langchain.com"
+  LANGCHAIN_PROJECT: "hybrid-rag-enterprise"
+  
+  # Database Configuration
+  DATABASE_URL: "sqlite:////data/app.db"
+  
+  # ChromaDB Configuration
+  CHROMA_PERSIST_DIRECTORY: "/app/chroma_db"
+  CHROMA_COLLECTION_NAME: "hybrid_rag_docs"
+  
+  # Graph Storage Configuration
+  GRAPH_STORAGE_PATH: "/app/graph_storage/knowledge_graph.json"
+  
+  # RAPTOR Configuration
+  RAPTOR_MAX_LEVELS: "3"
+  RAPTOR_CLUSTER_SIZE: "10"
+  RAPTOR_SUMMARY_MODEL: "gpt-4o-mini"
+  
+  # GraphRAG Configuration
+  GRAPHRAG_ENTITY_EXTRACTION_MODEL: "gpt-4o-mini"
+  GRAPHRAG_COMMUNITY_DETECTION: "true"
+  
+  # Chunking Configuration
+  CHUNK_SIZE: "1000"
+  CHUNK_OVERLAP: "200"
+  
+  # CORS Configuration
+  CORS_ORIGINS: "*"

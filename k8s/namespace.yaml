@@ -1,0 +1,8 @@
+# Kubernetes Namespace for Hybrid RAG Enterprise
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hybrid-rag
+  labels:
+    app.kubernetes.io/name: hybrid-rag
+    app.kubernetes.io/part-of: hybrid-rag-enterprise

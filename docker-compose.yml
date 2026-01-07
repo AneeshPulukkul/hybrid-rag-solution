@@ -1,0 +1,102 @@
+# Docker Compose for Hybrid RAG Enterprise Solution
+# Supports local development and on-premises deployment
+# For cloud deployment, use individual Dockerfiles with cloud-specific orchestration
+
+version: '3.8'
+
+services:
+  # Backend API Service
+  backend:
+    build:
+      context: ./hybrid-rag-backend
+      dockerfile: Dockerfile
+    container_name: hybrid-rag-backend
+    ports:
+      - "8000:8000"
+    environment:
+      # OpenAI Configuration
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
+      - OPENAI_EMBEDDING_MODEL=${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
+      
+      # LangSmith Observability
+      - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2:-true}
+      - LANGCHAIN_ENDPOINT=${LANGCHAIN_ENDPOINT:-https://api.smith.langchain.com}
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
+      - LANGCHAIN_PROJECT=${LANGCHAIN_PROJECT:-hybrid-rag-enterprise}
+      
+      # Database Configuration
+      - DATABASE_URL=sqlite:////data/app.db
+      
+      # ChromaDB Configuration
+      - CHROMA_PERSIST_DIRECTORY=/app/chroma_db
+      - CHROMA_COLLECTION_NAME=${CHROMA_COLLECTION_NAME:-hybrid_rag_docs}
+      
+      # Graph Storage Configuration
+      - GRAPH_STORAGE_PATH=/app/graph_storage/knowledge_graph.json
+      
+      # RAPTOR Configuration
+      - RAPTOR_MAX_LEVELS=${RAPTOR_MAX_LEVELS:-3}
+      - RAPTOR_CLUSTER_SIZE=${RAPTOR_CLUSTER_SIZE:-10}
+      - RAPTOR_SUMMARY_MODEL=${RAPTOR_SUMMARY_MODEL:-gpt-4o-mini}
+      
+      # GraphRAG Configuration
+      - GRAPHRAG_ENTITY_EXTRACTION_MODEL=${GRAPHRAG_ENTITY_EXTRACTION_MODEL:-gpt-4o-mini}
+      - GRAPHRAG_COMMUNITY_DETECTION=${GRAPHRAG_COMMUNITY_DETECTION:-true}
+      
+      # Chunking Configuration
+      - CHUNK_SIZE=${CHUNK_SIZE:-1000}
+      - CHUNK_OVERLAP=${CHUNK_OVERLAP:-200}
+      
+      # CORS Configuration
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
+    volumes:
+      - backend-data:/data
+      - chroma-data:/app/chroma_db
+      - graph-data:/app/graph_storage
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - hybrid-rag-network
+
+  # Frontend Web Application
+  frontend:
+    build:
+      context: ./hybrid-rag-frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
+    container_name: hybrid-rag-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+    networks:
+      - hybrid-rag-network
+
+# Named volumes for data persistence
+volumes:
+  backend-data:
+    driver: local
+  chroma-data:
+    driver: local
+  graph-data:
+    driver: local
+
+# Network for service communication
+networks:
+  hybrid-rag-network:
+    driver: bridge

@@ -1,0 +1,67 @@
+# Ingress for external access
+# Works with NGINX Ingress Controller, AWS ALB, Azure Application Gateway, GCP Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hybrid-rag-ingress
+  namespace: hybrid-rag
+  labels:
+    app.kubernetes.io/name: hybrid-rag
+    app.kubernetes.io/part-of: hybrid-rag-enterprise
+  annotations:
+    # NGINX Ingress Controller annotations
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    
+    # For AWS ALB Ingress Controller, uncomment:
+    # kubernetes.io/ingress.class: alb
+    # alb.ingress.kubernetes.io/scheme: internet-facing
+    # alb.ingress.kubernetes.io/target-type: ip
+    
+    # For GCP Ingress, uncomment:
+    # kubernetes.io/ingress.class: gce
+    
+    # For Azure Application Gateway, uncomment:
+    # kubernetes.io/ingress.class: azure/application-gateway
+spec:
+  ingressClassName: nginx  # Change based on your ingress controller
+  rules:
+    - host: hybrid-rag.example.com  # Replace with your domain
+      http:
+        paths:
+          # Frontend routes
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hybrid-rag-frontend
+                port:
+                  number: 80
+          # Backend API routes
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: hybrid-rag-backend
+                port:
+                  number: 8000
+          - path: /health
+            pathType: Exact
+            backend:
+              service:
+                name: hybrid-rag-backend
+                port:
+                  number: 8000
+          - path: /docs
+            pathType: Prefix
+            backend:
+              service:
+                name: hybrid-rag-backend
+                port:
+                  number: 8000
+  # TLS configuration - uncomment and configure for HTTPS
+  # tls:
+  #   - hosts:
+  #       - hybrid-rag.example.com
+  #     secretName: hybrid-rag-tls

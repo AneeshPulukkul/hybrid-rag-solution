@@ -1,0 +1,56 @@
+# Persistent Volume Claims for data storage
+# These work across cloud providers (AWS EBS, Azure Disk, GCP PD) and on-prem
+
+---
+# Data PVC for SQLite database
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hybrid-rag-data-pvc
+  namespace: hybrid-rag
+  labels:
+    app.kubernetes.io/name: hybrid-rag
+    app.kubernetes.io/component: storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  # storageClassName: default  # Uncomment and set for specific storage class
+
+---
+# ChromaDB PVC for vector embeddings
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hybrid-rag-chroma-pvc
+  namespace: hybrid-rag
+  labels:
+    app.kubernetes.io/name: hybrid-rag
+    app.kubernetes.io/component: storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  # storageClassName: default  # Uncomment and set for specific storage class
+
+---
+# Graph Storage PVC for knowledge graph
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hybrid-rag-graph-pvc
+  namespace: hybrid-rag
+  labels:
+    app.kubernetes.io/name: hybrid-rag
+    app.kubernetes.io/component: storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  # storageClassName: default  # Uncomment and set for specific storage class
