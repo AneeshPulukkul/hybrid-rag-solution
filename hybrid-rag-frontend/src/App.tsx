@@ -141,7 +141,7 @@ function App() {
           <div className="flex items-center justify-between text-sm text-slate-400">
             <div className="flex items-center gap-2">
               <Activity className="h-4 w-4" />
-              <span>Powered by LangGraph + LangSmith</span>
+              <span>Powered by LangGraph + Langfuse</span>
             </div>
             <div className="flex items-center gap-4">
               <Badge variant="outline" className="border-blue-500 text-blue-400">

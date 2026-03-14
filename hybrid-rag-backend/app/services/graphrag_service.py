@@ -5,7 +5,7 @@ from collections import defaultdict
 
 from langchain_core.prompts import ChatPromptTemplate
 
-from app.core.config import settings
+from app.core.config import settings, get_langfuse_handler
 from app.core.database import get_db
 from app.models.schemas import Entity, Relationship, Community, Chunk
 
@@ -225,10 +225,11 @@ class GraphRAGService:
         chain = ENTITY_EXTRACTION_PROMPT | self.llm
         
         try:
+            callbacks = [h for h in [get_langfuse_handler()] if h is not None]
             response = chain.invoke({
                 "entity_types": ", ".join(settings.graphrag_entity_types),
                 "text": chunk.content
-            })
+            }, config={"callbacks": callbacks})
             
             content = response.content
             if "```json" in content:
@@ -324,10 +325,11 @@ class GraphRAGService:
             return "Empty community"
         
         chain = COMMUNITY_SUMMARY_PROMPT | self.llm
+        callbacks = [h for h in [get_langfuse_handler()] if h is not None]
         response = chain.invoke({
             "entities": entities,
             "relationships": relationships or "No relationships"
-        })
+        }, config={"callbacks": callbacks})
         return response.content
     
     def _save_entity(self, entity: Entity):

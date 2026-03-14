@@ -4,7 +4,7 @@ from typing import Optional
 
 from langchain_core.prompts import ChatPromptTemplate
 
-from app.core.config import settings
+from app.core.config import settings, get_langfuse_handler
 from app.core.database import get_db
 from app.models.schemas import RaptorNode, Chunk
 
@@ -184,7 +184,8 @@ class RaptorService:
     
     def _generate_summary(self, content: str) -> str:
         chain = SUMMARIZATION_PROMPT | self.llm
-        response = chain.invoke({"chunks": content[:8000]})
+        callbacks = [h for h in [get_langfuse_handler()] if h is not None]
+        response = chain.invoke({"chunks": content[:8000]}, config={"callbacks": callbacks})
         return response.content
     
     def _save_node(self, node: RaptorNode):

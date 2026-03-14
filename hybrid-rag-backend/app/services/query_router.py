@@ -6,7 +6,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langgraph.graph import StateGraph, END
 from langgraph.graph.message import add_messages
 
-from app.core.config import settings
+from app.core.config import settings, get_langfuse_handler
 from app.models.schemas import QueryType
 
 
@@ -97,7 +97,8 @@ class QueryRouter:
             return state
         
         chain = QUERY_CLASSIFICATION_PROMPT | self.llm
-        response = chain.invoke({"query": state["query"]})
+        callbacks = [h for h in [get_langfuse_handler()] if h is not None]
+        response = chain.invoke({"query": state["query"]}, config={"callbacks": callbacks})
         
         classification = response.content.strip().upper()
         
@@ -217,10 +218,11 @@ Please provide a comprehensive answer based on the context above:""")
         chain = generation_prompt | self.llm
         
         try:
+            callbacks = [h for h in [get_langfuse_handler()] if h is not None]
             response = chain.invoke({
                 "context": state["combined_context"] or "No context available.",
                 "query": state["query"]
-            })
+            }, config={"callbacks": callbacks})
             state["answer"] = response.content
         except Exception as e:
             state["answer"] = f"Error generating answer: {str(e)}"
@@ -240,12 +242,14 @@ Please provide a comprehensive answer based on the context above:""")
             "error": None
         }
         
-        result = self.graph.invoke(initial_state)
+        callbacks = [h for h in [get_langfuse_handler()] if h is not None]
+        result = self.graph.invoke(initial_state, config={"callbacks": callbacks})
         return result
     
     def classify_query_type(self, query: str) -> QueryType:
         chain = QUERY_CLASSIFICATION_PROMPT | self.llm
-        response = chain.invoke({"query": query})
+        callbacks = [h for h in [get_langfuse_handler()] if h is not None]
+        response = chain.invoke({"query": query}, config={"callbacks": callbacks})
         
         classification = response.content.strip().upper()
         
