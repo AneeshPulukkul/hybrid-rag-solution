@@ -12,9 +12,9 @@ class Settings(BaseSettings):
     openai_model: str = "gpt-4o-mini"
     openai_embedding_model: str = "text-embedding-3-small"
     
-    langchain_api_key: Optional[str] = None
-    langchain_tracing_v2: bool = True
-    langchain_project: str = "hybrid-rag-enterprise"
+    langfuse_secret_key: Optional[str] = None
+    langfuse_public_key: Optional[str] = None
+    langfuse_base_url: str = "https://cloud.langfuse.com"
     
     database_url: str = "sqlite:///./data/hybrid_rag.db"
     chroma_persist_directory: str = "./data/chroma"
@@ -51,7 +51,20 @@ settings = Settings()
 
 if settings.openai_api_key:
     os.environ["OPENAI_API_KEY"] = settings.openai_api_key
-if settings.langchain_api_key:
-    os.environ["LANGCHAIN_API_KEY"] = settings.langchain_api_key
-    os.environ["LANGCHAIN_TRACING_V2"] = str(settings.langchain_tracing_v2).lower()
-    os.environ["LANGCHAIN_PROJECT"] = settings.langchain_project
+if settings.langfuse_secret_key and settings.langfuse_public_key:
+    os.environ["LANGFUSE_SECRET_KEY"] = settings.langfuse_secret_key
+    os.environ["LANGFUSE_PUBLIC_KEY"] = settings.langfuse_public_key
+    os.environ["LANGFUSE_BASE_URL"] = settings.langfuse_base_url
+
+    from langfuse import Langfuse
+    langfuse_client = Langfuse()
+else:
+    langfuse_client = None
+
+
+def get_langfuse_handler():
+    """Return a Langfuse CallbackHandler for LangChain tracing, or None if not configured."""
+    if langfuse_client is not None:
+        from langfuse.langchain import CallbackHandler
+        return CallbackHandler()
+    return None

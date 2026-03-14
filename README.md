@@ -13,7 +13,7 @@ This enterprise solution provides intelligent document retrieval and question an
 
 - **Intelligent Query Routing**: LangGraph-based router automatically classifies queries and routes to the optimal retrieval strategy
 - **AG-UI Protocol**: Real-time streaming responses with standardized agent-to-UI communication
-- **LangSmith Observability**: Full tracing, monitoring, and evaluation capabilities
+- **Langfuse Observability**: Full tracing, monitoring, and evaluation capabilities
 - **Cloud-Native Architecture**: Docker containerization and Kubernetes manifests for deployment across AWS, Azure, GCP, or on-premises
 
 ## Architecture
@@ -26,7 +26,7 @@ This enterprise solution provides intelligent document retrieval and question an
                                              |
                                              v
 +------------------+              +----------+----------+
-|   LangSmith      |<------------>|   FastAPI Backend   |
+|   Langfuse       |<------------>|   FastAPI Backend   |
 |   Observability  |              |                     |
 +------------------+              +----------+----------+
                                              |
@@ -72,7 +72,7 @@ This enterprise solution provides intelligent document retrieval and question an
 | Frontend Framework | React + TypeScript + Vite |
 | UI Components | shadcn/ui + Tailwind CSS |
 | Orchestration | LangGraph |
-| Observability | LangSmith |
+| Observability | Langfuse |
 | Vector Store | ChromaDB |
 | Graph Store | NetworkX |
 | Database | SQLite |
@@ -259,9 +259,9 @@ kubectl get ingress -n hybrid-rag
 | `OPENAI_API_KEY` | OpenAI API key (required) | - |
 | `OPENAI_MODEL` | LLM model for generation | gpt-4o-mini |
 | `OPENAI_EMBEDDING_MODEL` | Embedding model | text-embedding-3-small |
-| `LANGCHAIN_API_KEY` | LangSmith API key (optional) | - |
-| `LANGCHAIN_TRACING_V2` | Enable LangSmith tracing | true |
-| `LANGCHAIN_PROJECT` | LangSmith project name | hybrid-rag-enterprise |
+| `LANGFUSE_SECRET_KEY` | Langfuse secret key (optional) | - |
+| `LANGFUSE_PUBLIC_KEY` | Langfuse public key (optional) | - |
+| `LANGFUSE_BASE_URL` | Langfuse base URL | https://cloud.langfuse.com |
 | `DATABASE_URL` | SQLite database path | sqlite:///./data/hybrid_rag.db |
 | `CHUNK_SIZE` | Document chunk size | 1000 |
 | `CHUNK_OVERLAP` | Chunk overlap | 200 |
@@ -326,25 +326,25 @@ Use the Query tab to ask questions. The system automatically routes queries:
 - **Knowledge Graph tab**: Explore extracted entities and relationships
 - **RAPTOR Tree tab**: View hierarchical document summaries
 
-## Observability with LangSmith
+## Observability with Langfuse
 
-To enable LangSmith observability:
+To enable Langfuse observability:
 
-1. Create a LangSmith account at https://smith.langchain.com
-2. Get your API key
+1. Create a Langfuse account at https://cloud.langfuse.com (or self-host)
+2. Create a project and get your API keys from the project settings
 3. Set environment variables:
    ```
-   LANGCHAIN_API_KEY=your-api-key
-   LANGCHAIN_TRACING_V2=true
-   LANGCHAIN_PROJECT=hybrid-rag-enterprise
+   LANGFUSE_SECRET_KEY=sk-lf-your-secret-key
+   LANGFUSE_PUBLIC_KEY=pk-lf-your-public-key
+   LANGFUSE_BASE_URL=https://cloud.langfuse.com
    ```
 
-LangSmith provides:
+Langfuse provides:
 - Request/response tracing
 - Latency monitoring
-- Token usage tracking
+- Token usage and cost tracking
 - Error debugging
-- Evaluation capabilities
+- Prompt management and evaluation capabilities
 
 ## Scaling Considerations
 
@@ -377,7 +377,7 @@ The backend uses lazy initialization to minimize memory footprint:
    - Consider using smaller embedding models
 
 2. **Slow query responses**
-   - Check LangSmith traces for bottlenecks
+   - Check Langfuse traces for bottlenecks
    - Reduce chunk size for faster retrieval
    - Enable response streaming
 

@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.core.config import settings
+from app.core.config import settings, langfuse_client
 from app.core.database import init_db
 from app.routers import (
     documents_router,
@@ -16,6 +16,8 @@ from app.routers import (
 async def lifespan(app: FastAPI):
     init_db()
     yield
+    if langfuse_client is not None:
+        langfuse_client.flush()
 
 
 app = FastAPI(
