@@ -13,7 +13,7 @@ data:
   OPENAI_EMBEDDING_MODEL: "text-embedding-3-small"
   
   # Langfuse Configuration
-  LANGFUSE_HOST: "https://cloud.langfuse.com"
+  LANGFUSE_BASE_URL: "https://cloud.langfuse.com"
   
   # Database Configuration
   DATABASE_URL: "sqlite:////data/app.db"

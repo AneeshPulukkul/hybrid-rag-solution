@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     
     langfuse_secret_key: Optional[str] = None
     langfuse_public_key: Optional[str] = None
-    langfuse_host: str = "https://cloud.langfuse.com"
+    langfuse_base_url: str = "https://cloud.langfuse.com"
     
     database_url: str = "sqlite:///./data/hybrid_rag.db"
     chroma_persist_directory: str = "./data/chroma"
@@ -54,7 +54,7 @@ if settings.openai_api_key:
 if settings.langfuse_secret_key and settings.langfuse_public_key:
     os.environ["LANGFUSE_SECRET_KEY"] = settings.langfuse_secret_key
     os.environ["LANGFUSE_PUBLIC_KEY"] = settings.langfuse_public_key
-    os.environ["LANGFUSE_HOST"] = settings.langfuse_host
+    os.environ["LANGFUSE_BASE_URL"] = settings.langfuse_base_url
 
     from langfuse import Langfuse
     langfuse_client = Langfuse()

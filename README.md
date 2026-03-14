@@ -261,7 +261,7 @@ kubectl get ingress -n hybrid-rag
 | `OPENAI_EMBEDDING_MODEL` | Embedding model | text-embedding-3-small |
 | `LANGFUSE_SECRET_KEY` | Langfuse secret key (optional) | - |
 | `LANGFUSE_PUBLIC_KEY` | Langfuse public key (optional) | - |
-| `LANGFUSE_HOST` | Langfuse host URL | https://cloud.langfuse.com |
+| `LANGFUSE_BASE_URL` | Langfuse base URL | https://cloud.langfuse.com |
 | `DATABASE_URL` | SQLite database path | sqlite:///./data/hybrid_rag.db |
 | `CHUNK_SIZE` | Document chunk size | 1000 |
 | `CHUNK_OVERLAP` | Chunk overlap | 200 |
@@ -336,7 +336,7 @@ To enable Langfuse observability:
    ```
    LANGFUSE_SECRET_KEY=sk-lf-your-secret-key
    LANGFUSE_PUBLIC_KEY=pk-lf-your-public-key
-   LANGFUSE_HOST=https://cloud.langfuse.com
+   LANGFUSE_BASE_URL=https://cloud.langfuse.com
    ```
 
 Langfuse provides:
